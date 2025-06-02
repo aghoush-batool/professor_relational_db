@@ -1,0 +1,140 @@
+***                  **                    **                   **                     **                    **                 ***
+* This Readme file contain all the queries i have applied to my project named Relational Database for University Professor's data *
+***                  **                    **                   **                     **                    **                 ***
+
+
+
+
+CREATE TABLE professor(
+firstname TEXT,
+lastname TEXT,
+university TEXT,
+university_shortname TEXT,
+university_city TEXT,
+title TEXT,
+organization TEXT,
+organization_sector TEXT
+);
+
+COPY professor(firstname,
+lastname,
+university,
+university_shortname,
+university_city,
+title,
+organization,
+organization_sector)
+FROM 'C:\university_professors.csv'
+WITH(
+FORMAT csv,
+HEADER true,
+DELIMITER ',',
+ENCODING 'ISO_8859_7'
+);
+
+
+----------------------------------------
+INSERT INTO professor (
+    firstname, lastname, university, university_shortname,
+    university_city, title, organization, organization_sector
+) VALUES (
+    'Maria', 'Papadopoulou', 'University of Athens', 'UoA',
+    'Athens', 'Associate Professor', 'Dept. of Informatics', 'Education'
+);
+
+---------------------------------------
+UPDATE professor
+SET title = 'Full Professor'
+WHERE lastname = 'Papadopoulou' AND university_shortname = 'UoA';
+
+-------------------------------------
+DELETE FROM professor
+WHERE lastname = 'Papadopoulou' AND university_shortname = 'UoA';
+
+-------------------------------------------
+SELECT DISTINCT university_city
+FROM professor;
+
+--------------------------------------
+SELECT COUNT(*) AS total_professors
+FROM professor;
+
+--------------------------------------------------
+SELECT university_shortname, COUNT(*) AS professor_count
+FROM professor
+GROUP BY university_shortname;
+
+-----------------------------------
+SELECT MAX(years_of_experience) AS max_experience
+FROM professor;
+
+--------------------------------------------------
+SELECT university_shortname, AVG(years_of_experience) AS avg_experience
+FROM professor
+GROUP BY university_shortname;
+
+------------------------------
+SELECT *
+FROM professor
+WHERE lastname LIKE 'Pap%';
+
+-------------
+SELECT *
+FROM professor
+WHERE organization IS NULL;
+
+----------------------
+SELECT firstname, lastname, university_city
+FROM professor
+WHERE university_city = 'Athens'
+UNION
+SELECT firstname, lastname, university_city
+FROM professor
+WHERE university_city = 'Thessaloniki';
+
+---------------------
+SELECT firstname, lastname, university_city
+FROM professor
+WHERE university_city = 'Athens'
+UNION ALL
+SELECT firstname, lastname, university_city
+FROM professor
+WHERE university_city = 'Thessaloniki';
+
+--------------------------
+SELECT firstname, lastname
+FROM professor
+WHERE organization_sector = 'Education'
+INTERSECT
+SELECT firstname, lastname
+FROM professor
+WHERE organization_sector = 'Research';
+
+-------------------------------
+SELECT firstname, lastname
+FROM professor
+WHERE university_city = 'Athens'
+EXCEPT
+SELECT firstname, lastname
+FROM professor
+WHERE university_city = 'Thessaloniki';
+
+
+------------------
+SELECT p.firstname, p.lastname, u.fullname, u.city
+FROM professor p
+INNER JOIN university u
+ON p.university_shortname = u.shortname;
+
+--------------------------------------------
+SELECT p.firstname, p.lastname, u.fullname
+FROM professor p
+LEFT JOIN university u
+ON p.university_shortname = u.shortname;
+
+
+--------------------------------
+ALTER TABLE professor
+ADD CONSTRAINT fk_university
+FOREIGN KEY (university_shortname)
+REFERENCES university(shortname);
